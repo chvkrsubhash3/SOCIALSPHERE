@@ -2,11 +2,16 @@
   "name": "socialsphere",
   "version": "1.0.0",
   "private": true,
-  "description": "SocialSphere - Fullstack Application configured for Vercel & Neon PostgreSQL",
+  "description": "SocialSphere - Fullstack Application with Unified Startup for GCP VM & Cloud Host",
   "scripts": {
-    "build": "cd frontend && npm run build",
-    "vercel-build": "cd backend && npm install && npm run build && cd ../frontend && npm install && npm run build",
+    "install:all": "cd backend && npm install && cd ../frontend && npm install",
+    "build": "cd backend && npm run build && cd ../frontend && npm run build",
+    "start": "npx concurrently --kill-others \"npm --prefix backend start\" \"npm --prefix frontend start\"",
+    "dev": "npx concurrently --kill-others \"npm --prefix backend run dev\" \"npm --prefix frontend run dev\"",
     "migrate": "cd backend && npm run migrate",
     "seed": "cd backend && npm run seed"
+  },
+  "devDependencies": {
+    "concurrently": "^8.2.2"
   }
 }
