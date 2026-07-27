@@ -2,9 +2,22 @@ import knex, { Knex } from 'knex';
 import { config } from './env';
 import { logger } from '../utils/logger';
 
+const isCloudPg = process.env.DB_SSL === 'true' ||
+  config.databaseUrl.includes('sslmode=require') ||
+  config.databaseUrl.includes('neon.tech') ||
+  config.databaseUrl.includes('supabase.co') ||
+  config.databaseUrl.includes('supabase.com');
+
+const dbConnectionConfig = isCloudPg
+  ? {
+      connectionString: config.databaseUrl,
+      ssl: { rejectUnauthorized: false },
+    }
+  : config.databaseUrl;
+
 export const db: Knex = knex({
   client: 'pg',
-  connection: config.databaseUrl,
+  connection: dbConnectionConfig,
   pool: {
     min: 2,
     max: 20,

@@ -6,7 +6,6 @@
 ![Mode](https://img.shields.io/badge/Mode-Training%20%2F%20Secure-f59e0b?style=for-the-badge)
 ![Vulnerabilities](https://img.shields.io/badge/Vulnerabilities-50-ef4444?style=for-the-badge)
 ![OWASP](https://img.shields.io/badge/OWASP-Top%2010-00aa55?style=for-the-badge)
-![Docker](https://img.shields.io/badge/Docker-Ready-2496ED?style=for-the-badge&logo=docker)
 ![License](https://img.shields.io/badge/License-MIT-green?style=for-the-badge)
 
 **A production-quality, intentionally vulnerable social media platform for cybersecurity training.**
@@ -56,7 +55,7 @@ Underneath this polished exterior are **50 documented, exploitable vulnerabiliti
 │   🔒 Secure (Production-like)           │
 │   • Parameterized queries               │
 │   • HTML sanitization                   │
-│   • Redis rate limiting                 │
+│   • Rate limiting                       │
 │   • Strict JWT verification             │
 │   • Secure cookies (HttpOnly, SameSite) │
 │   • RBAC ownership checks               │
@@ -65,51 +64,29 @@ Underneath this polished exterior are **50 documented, exploitable vulnerabiliti
 
 ---
 
-## 🚀 Quick Start
+## 🚀 Quick Start (Supabase / Neon / PostgreSQL)
 
 ### Prerequisites
-- Docker Desktop 4.x+
-- Docker Compose 2.x+
-- 8GB RAM recommended
-- Ports 80, 3000, 4000, 5432, 6379, 9000, 9001, 8025, 3001, 9090 available
+- Node.js 18+ & npm 9+
+- Hosted PostgreSQL database (Supabase or Neon) or local PostgreSQL
 
-### Start in Training Mode (Vulnerable)
+### Setup & Launch
 
-```bash
-# Clone the repository
-git clone https://github.com/yourusername/socialsphere.git
-cd socialsphere
+1. **Configure Environment:**
+   Set `DATABASE_URL` in `.env` with your Supabase or Neon PostgreSQL connection string:
+   - **Neon:** `postgresql://[USER]:[PASSWORD]@[EP_ID].neon.tech/[DB]?sslmode=require`
+   - **Supabase:** `postgresql://postgres:[PASSWORD]@db.[REF].supabase.co:5432/postgres`
 
-# Copy environment file
-cp .env.example .env
+2. **Install Dependencies & Migrate Database:**
+   ```bash
+   npm run install  # Or: cd backend && npm i; cd ../frontend && npm i
+   npm run migrate  # Runs migrations on DATABASE_URL
+   npm run seed     # Seeds demo data
+   ```
 
-# Start all services
-docker compose up -d
-
-# Wait for services to start, then seed the database
-docker compose exec backend npm run migrate
-docker compose exec backend npm run seed
-
-# Open the application
-open http://localhost
-```
-
-### Start in Secure Mode
-
-```bash
-cp .env.secure .env
-TRAINING_MODE=false docker compose up -d
-```
-
-### Using Make
-
-```bash
-make up          # Start (Training Mode)
-make up-secure   # Start (Secure Mode)
-make seed        # Seed demo data
-make logs        # View logs
-make down        # Stop all services
-```
+3. **Start Development Servers:**
+   - Backend API: `npm run dev-backend` (runs on http://localhost:4000)
+   - Frontend Web: `npm run dev-frontend` (runs on http://localhost:3000)
 
 ---
 

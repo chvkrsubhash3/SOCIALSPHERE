@@ -22,26 +22,42 @@ redis.on('error', (err) => logger.error('Redis error:', err));
 redis.on('close', () => logger.warn('Redis connection closed'));
 
 // ─────────────────────────────────────────────
-// Cache helpers
+// Cache helpers (Safe when Redis is offline)
 // ─────────────────────────────────────────────
 
 export async function getCache<T>(key: string): Promise<T | null> {
-  const val = await redis.get(key);
-  return val ? JSON.parse(val) : null;
+  try {
+    const val = await redis.get(key);
+    return val ? JSON.parse(val) : null;
+  } catch (err) {
+    return null;
+  }
 }
 
 export async function setCache(key: string, value: any, ttlSeconds = 300): Promise<void> {
-  await redis.setex(key, ttlSeconds, JSON.stringify(value));
+  try {
+    await redis.setex(key, ttlSeconds, JSON.stringify(value));
+  } catch (err) {
+    // Ignore cache set failures when Redis is offline
+  }
 }
 
 export async function deleteCache(key: string): Promise<void> {
-  await redis.del(key);
+  try {
+    await redis.del(key);
+  } catch (err) {
+    // Ignore cache delete failures when Redis is offline
+  }
 }
 
 export async function invalidatePattern(pattern: string): Promise<void> {
-  const keys = await redis.keys(pattern);
-  if (keys.length > 0) {
-    await redis.del(...keys);
+  try {
+    const keys = await redis.keys(pattern);
+    if (keys.length > 0) {
+      await redis.del(...keys);
+    }
+  } catch (err) {
+    // Ignore cache invalidation failures when Redis is offline
   }
 }
 
@@ -50,14 +66,22 @@ export async function invalidatePattern(pattern: string): Promise<void> {
 // ─────────────────────────────────────────────
 
 export async function incrementRateLimit(key: string, window: number): Promise<number> {
-  const multi = redis.multi();
-  multi.incr(key);
-  multi.expire(key, window);
-  const results = await multi.exec();
-  return (results?.[0]?.[1] as number) ?? 0;
+  try {
+    const multi = redis.multi();
+    multi.incr(key);
+    multi.expire(key, window);
+    const results = await multi.exec();
+    return (results?.[0]?.[1] as number) ?? 0;
+  } catch (err) {
+    return 0;
+  }
 }
 
 export async function getRateLimit(key: string): Promise<number> {
-  const val = await redis.get(key);
-  return val ? parseInt(val) : 0;
+  try {
+    const val = await redis.get(key);
+    return val ? parseInt(val) : 0;
+  } catch (err) {
+    return 0;
+  }
 }

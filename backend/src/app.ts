@@ -126,8 +126,19 @@ app.get('/', (_req, res) => {
 app.get('/health', async (_req, res) => {
   try {
     await db.raw('SELECT 1');
-    await redis.ping();
-    res.json({ status: 'healthy', timestamp: new Date().toISOString() });
+    let redisConnected = false;
+    try {
+      await redis.ping();
+      redisConnected = true;
+    } catch {
+      // Redis is optional
+    }
+    res.json({
+      status: 'healthy',
+      database: 'connected',
+      redis: redisConnected ? 'connected' : 'offline',
+      timestamp: new Date().toISOString(),
+    });
   } catch (err) {
     res.status(503).json({ status: 'unhealthy', error: (err as Error).message });
   }
@@ -192,9 +203,13 @@ async function bootstrap() {
     await db.raw('SELECT 1');
     logger.info('✅ PostgreSQL connected');
 
-    // Test Redis connection
-    await redis.ping();
-    logger.info('✅ Redis connected');
+    // Test Redis connection (Optional)
+    try {
+      await redis.ping();
+      logger.info('✅ Redis connected');
+    } catch {
+      logger.warn('⚠️ Redis not available — caching & rate limiting disabled');
+    }
 
     httpServer.listen(config.port, config.host, () => {
       logger.info(`
@@ -229,6 +244,9 @@ process.on('SIGINT', async () => {
   process.exit(0);
 });
 
-bootstrap();
+if (!process.env.VERCEL) {
+  bootstrap();
+}
 
+export default app;
 export { app, httpServer, io };
