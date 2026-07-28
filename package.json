@@ -86,6 +86,7 @@
     "swagger-ui-express": "^5.0.0",
     "tailwind-merge": "^2.2.1",
     "tailwindcss": "^3.4.3",
+    "tailwindcss-animate": "^1.0.7",
     "uuid": "^9.0.1",
     "validator": "^13.11.0",
     "winston": "^3.11.0",
