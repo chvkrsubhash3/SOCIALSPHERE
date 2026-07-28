@@ -190,10 +190,10 @@ if (!config.isProduction) {
 // 🔒 SECURE: Generic error messages
 // ─────────────────────────────────────────────
 
-// 404 handler
-app.use((_req: Request, res: Response) => {
+// 404 handler for unmatched API routes
+app.use('/api/*', (_req: Request, res: Response) => {
   res.status(404).json({
-    error: 'Not Found',
+    error: 'API Endpoint Not Found',
     path: _req.path,
     // ⚠️ Training: exposes path info
     ...(config.trainingMode && { availableRoutes: '/api-docs' }),
