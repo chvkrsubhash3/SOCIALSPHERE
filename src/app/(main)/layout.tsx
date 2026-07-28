@@ -257,5 +257,3 @@ function Check({ className }: { className?: string }) {
     </svg>
   );
 }
-
-}
