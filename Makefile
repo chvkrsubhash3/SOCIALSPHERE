@@ -28,46 +28,31 @@ help: ## Show this help message
 # DATABASE
 # ─────────────────────────────────────────────
 migrate: ## Run database migrations on configured DATABASE_URL
-	cd backend && npm run migrate
+	npm run migrate
 
 rollback: ## Rollback last database migration
-	cd backend && npm run migrate:rollback
+	npm run migrate:rollback
 
 seed: ## Seed database with demo data
-	cd backend && npm run seed
-
-db-reset: ## Reset and reseed database
-	cd backend && npm run db:reset
+	npm run seed
 
 # ─────────────────────────────────────────────
 # DEVELOPMENT
 # ─────────────────────────────────────────────
-dev-backend: ## Start backend in dev mode (local)
-	cd backend && npm run dev
+dev: ## Start unified app in dev mode (local)
+	npm run dev
 
-dev-frontend: ## Start frontend in dev mode (local)
-	cd frontend && npm run dev
+start: ## Start production server
+	npm start
 
 install: ## Install all dependencies
-	cd backend && npm install
-	cd frontend && npm install
+	npm install
 
 # ─────────────────────────────────────────────
 # TESTING
 # ─────────────────────────────────────────────
-test: test-backend test-frontend ## Run all tests
-
-test-backend: ## Run backend unit + integration tests
-	cd backend && npm test
-
-test-frontend: ## Run frontend tests
-	cd frontend && npm test
-
-test-e2e: ## Run Playwright E2E tests
-	cd frontend && npx playwright test
-
-test-vulns: ## Run automated vulnerability tests
-	cd backend && npm run test:vulns
+test: ## Run tests
+	npm test
 
 # ─────────────────────────────────────────────
 # LAB MODE
@@ -98,14 +83,13 @@ docs: ## Serve documentation locally
 	cd docs && npx serve .
 
 swagger: ## Open Swagger UI
-	@echo "📖 Swagger UI: http://localhost:4000/api-docs"
+	@echo "📖 Swagger UI: http://localhost:3000/api-docs"
 
 # ─────────────────────────────────────────────
 # CLEAN
 # ─────────────────────────────────────────────
 clean: ## Remove build artifacts
-	cd backend && rm -rf dist/
-	cd frontend && rm -rf .next/ out/
+	rm -rf .next/ dist/ out/
 
 reset: clean ## Full reset build artifacts
 	@echo "💥 Reset complete"

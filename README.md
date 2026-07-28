@@ -79,14 +79,15 @@ Underneath this polished exterior are **50 documented, exploitable vulnerabiliti
 
 2. **Install Dependencies & Migrate Database:**
    ```bash
-   npm run install  # Or: cd backend && npm i; cd ../frontend && npm i
+   npm install      # Installs all dependencies in root
    npm run migrate  # Runs migrations on DATABASE_URL
    npm run seed     # Seeds demo data
    ```
 
-3. **Start Development Servers:**
-   - Backend API: `npm run dev-backend` (runs on http://localhost:4000)
-   - Frontend Web: `npm run dev-frontend` (runs on http://localhost:3000)
+3. **Start Unified Application:**
+   ```bash
+   npm run dev      # Runs fullstack application on http://localhost:3000
+   ```
 
 ---
 

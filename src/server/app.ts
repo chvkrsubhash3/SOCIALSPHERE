@@ -244,7 +244,7 @@ process.on('SIGINT', async () => {
   process.exit(0);
 });
 
-if (!process.env.VERCEL) {
+if (require.main === module && !process.env.VERCEL) {
   bootstrap();
 }
 

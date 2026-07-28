@@ -26,11 +26,11 @@ export const db: Knex = knex({
     reapIntervalMillis: 1000,
   },
   migrations: {
-    directory: '../database/migrations',
+    directory: './database/migrations',
     tableName: 'knex_migrations',
   },
   seeds: {
-    directory: '../database/seeds',
+    directory: './database/seeds',
   },
   debug: config.isDevelopment,
   log: {
