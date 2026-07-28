@@ -175,14 +175,14 @@ export function generateTokens(user: {
   };
 
   const accessToken = jwt.sign(payload, config.jwtSecret, {
-    expiresIn: config.jwtExpiresIn,
+    expiresIn: config.jwtExpiresIn as any,
     algorithm: 'HS256',
   });
 
   const refreshToken = jwt.sign(
     { userId: user.id },
     config.jwtRefreshSecret,
-    { expiresIn: config.jwtRefreshExpiresIn, algorithm: 'HS256' }
+    { expiresIn: config.jwtRefreshExpiresIn as any, algorithm: 'HS256' }
   );
 
   return { accessToken, refreshToken };
