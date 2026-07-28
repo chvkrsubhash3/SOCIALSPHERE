@@ -3,6 +3,27 @@ const nextConfig = {
   reactStrictMode: true,
   swcMinify: true,
 
+  experimental: {
+    serverComponentsExternalPackages: ['knex', 'pg', 'argon2', 'express'],
+  },
+
+  webpack: (config, { isServer }) => {
+    if (isServer) {
+      config.externals.push(
+        'oracledb',
+        'mariadb/callback',
+        'mariadb',
+        'mysql',
+        'mysql2',
+        'sqlite3',
+        'tedious',
+        'pg-query-stream',
+        'better-sqlite3'
+      );
+    }
+    return config;
+  },
+
   images: {
     domains: [
       'localhost',

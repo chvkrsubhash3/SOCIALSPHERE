@@ -1,0 +1,9 @@
+{
+  "openapi": "3.0.0",
+  "info": {
+    "title": "SocialSphere API",
+    "version": "1.0.0",
+    "description": "SocialSphere Unified API Documentation"
+  },
+  "paths": {}
+}

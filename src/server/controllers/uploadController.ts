@@ -283,24 +283,20 @@ export async function importXml(req: Request, res: Response): Promise<void> {
     );
   } else {
     // 🔒 SECURE: Disable external entity processing
-    // Use a safe XML parser configuration
-    const DOMParser = require('@xmldom/xmldom').DOMParser;
-    const parser = new DOMParser({
-      // 🔒 Disable external entities
-      locator: {},
-      errorHandler: {
-        warning: () => {},
-        error: (msg: string) => { throw new Error(msg); },
-        fatalError: (msg: string) => { throw new Error(msg); },
-      },
-    });
-
     try {
+      const { DOMParser } = require('@xmldom/xmldom');
+      const parser = new DOMParser({
+        locator: {},
+        errorHandler: {
+          warning: () => {},
+          error: (msg: string) => { throw new Error(msg); },
+          fatalError: (msg: string) => { throw new Error(msg); },
+        },
+      });
       const doc = parser.parseFromString(xmlData, 'text/xml');
-      // Process safe XML
       res.json({ message: 'XML imported successfully' });
     } catch (err: any) {
-      res.status(400).json({ error: 'Invalid XML' });
+      res.status(400).json({ error: 'Invalid XML or parser error' });
     }
   }
 }
