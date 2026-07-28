@@ -26,11 +26,9 @@ const nextConfig = {
       {
         source: '/(.*)',
         headers: [
-          // ⚠️ TRAINING: These headers intentionally missing for labs
-          // 🔒 SECURE: Uncomment for production
-          // { key: 'X-Frame-Options', value: 'DENY' },
-          // { key: 'X-Content-Type-Options', value: 'nosniff' },
-          // { key: 'Referrer-Policy', value: 'strict-origin-when-cross-origin' },
+          { key: 'X-Content-Type-Options', value: 'nosniff' },
+          { key: 'X-Frame-Options', value: 'SAMEORIGIN' },
+          { key: 'Referrer-Policy', value: 'strict-origin-when-cross-origin' },
         ],
       },
     ];
