@@ -3,7 +3,7 @@ import bcrypt from 'bcryptjs';
 import argon2 from 'argon2';
 import { v4 as uuidv4 } from 'uuid';
 import crypto from 'crypto';
-import { db, rawQuery } from '../config/database';
+import { db, rawQuery, ensureDatabaseTables } from '../config/database';
 import { redis } from '../config/redis';
 import { config } from '../config/env';
 import { generateTokens } from '../middleware/auth';
@@ -21,6 +21,7 @@ import { logger, logSecurityEvent, logAudit } from '../utils/logger';
 // REGISTER
 // ─────────────────────────────────────────────
 export async function register(req: Request, res: Response): Promise<void> {
+  await ensureDatabaseTables();
   const { username, email, password, displayName } = req.body;
 
   // ─── Input Validation ───
@@ -114,36 +115,57 @@ export async function register(req: Request, res: Response): Promise<void> {
   }
 
   // ─── Create User ───
-  const [user] = await db('users').insert({
-    username,
-    email,
-    password_hash: passwordHash,
-    display_name: displayName || username,
-    role: 'user',
-    is_active: true,
-    is_verified: false,
-    verification_token: verificationToken,
-    created_at: new Date(),
-  }).returning(['id', 'username', 'email', 'role']);
+  let userId: number = 0;
+  try {
+    const inserted = await db('users').insert({
+      username,
+      email,
+      password_hash: passwordHash,
+      display_name: displayName || username,
+      role: 'user',
+      is_active: true,
+      is_verified: false,
+      verification_token: verificationToken,
+      created_at: new Date(),
+    }).returning('id');
+
+    userId = Array.isArray(inserted)
+      ? (typeof inserted[0] === 'object' ? (inserted[0] as any).id : inserted[0])
+      : inserted;
+  } catch (err: any) {
+    logger.error('Registration database insert failed:', err);
+    res.status(500).json({ error: err.message || 'Failed to create user' });
+    return;
+  }
 
   // Initialize user coins
-  await db('user_coins').insert({ user_id: user.id, balance: 100 });
+  try {
+    if (userId) {
+      await db('user_coins').insert({ user_id: userId, balance: 100 });
+    }
+  } catch {
+    // Non-critical
+  }
 
   // Send verification email
-  await emailService.sendVerificationEmail(email, verificationToken);
+  try {
+    await emailService.sendVerificationEmail(email, verificationToken);
+  } catch (emailErr) {
+    logger.warn('Failed to send verification email during registration:', emailErr);
+  }
 
   logAudit({
     action: 'USER_REGISTERED',
-    userId: user.id,
+    userId: userId,
     resource: 'users',
-    resourceId: user.id,
+    resourceId: userId,
     ip: req.ip,
     result: 'success',
   });
 
   res.status(201).json({
     message: 'Registration successful. Please check your email to verify your account.',
-    userId: user.id,
+    userId: userId,
     // ⚠️ TRAINING: Return token in response (should only be sent via email)
     ...(config.trainingMode && { verificationToken }),
   });
@@ -153,6 +175,7 @@ export async function register(req: Request, res: Response): Promise<void> {
 // LOGIN
 // ─────────────────────────────────────────────
 export async function login(req: Request, res: Response): Promise<void> {
+  await ensureDatabaseTables();
   const { email, password, rememberMe } = req.body;
 
   if (!email || !password) {
@@ -173,7 +196,7 @@ export async function login(req: Request, res: Response): Promise<void> {
           crypto.createHash('md5').update(password).digest('hex')
         }'`
       );
-      user = result.rows[0];
+      user = result?.rows ? result.rows[0] : (Array.isArray(result) ? result[0] : result);
     } catch (err: any) {
       // ⚠️ VULN #26: Stack trace disclosure
       res.status(500).json({
