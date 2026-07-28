@@ -18,11 +18,17 @@ import { useAuthStore } from '@/store/authStore';
 // ─────────────────────────────────────────────
 const isTraining = process.env.NEXT_PUBLIC_MODE === 'training';
 
-const loginSchema = z.object({
-  email: z.string().email('Please enter a valid email'),
-  password: z.string().min(isTraining ? 1 : 8, isTraining ? 'Required' : 'Password must be at least 8 characters'),
-  rememberMe: z.boolean().optional(),
-});
+const loginSchema = isTraining
+  ? z.object({
+      email: z.string().min(1, 'Please enter email or SQL payload'),
+      password: z.string().min(1, 'Password is required'),
+      rememberMe: z.boolean().optional(),
+    })
+  : z.object({
+      email: z.string().email('Please enter a valid email'),
+      password: z.string().min(8, 'Password must be at least 8 characters'),
+      rememberMe: z.boolean().optional(),
+    });
 
 type LoginForm = z.infer<typeof loginSchema>;
 
@@ -155,9 +161,9 @@ export default function LoginPage() {
               </label>
               <input
                 id="email"
-                type="email"
+                type={isTraining ? 'text' : 'email'}
                 autoComplete="email"
-                placeholder="you@example.com"
+                placeholder={isTraining ? "you@example.com or ' OR '1'='1" : "you@example.com"}
                 className="input-dark"
                 {...register('email')}
               />
