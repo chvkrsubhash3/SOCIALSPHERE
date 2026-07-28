@@ -113,7 +113,7 @@ app.use(auditMiddleware);
 // ─────────────────────────────────────────────
 const API = '/api' as const;
 
-app.get('/', (_req, res) => {
+app.get('/api', (_req, res) => {
   res.json({
     name: 'SocialSphere API',
     version: '1.0.0',
