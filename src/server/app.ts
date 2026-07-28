@@ -171,9 +171,18 @@ app.use(`${API}/lab`, labRoutes);
 // Swagger / API Docs
 // ─────────────────────────────────────────────
 if (!config.isProduction) {
-  const swaggerUi = require('swagger-ui-express');
-  const swaggerDoc = require('./docs/swagger.json');
-  app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDoc));
+  try {
+    const swaggerUi = require('swagger-ui-express');
+    let swaggerDoc;
+    try {
+      swaggerDoc = require('./docs/swagger.json');
+    } catch {
+      swaggerDoc = { openapi: '3.0.0', info: { title: 'SocialSphere API', version: '1.0.0' }, paths: {} };
+    }
+    app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDoc));
+  } catch {
+    // Swagger UI optional
+  }
 }
 
 // ─────────────────────────────────────────────
