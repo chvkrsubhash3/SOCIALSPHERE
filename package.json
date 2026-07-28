@@ -5,9 +5,9 @@
   "description": "SocialSphere - Intentionally Vulnerable Training Platform (Unified)",
   "main": "server.ts",
   "scripts": {
-    "dev": "nodemon --exec ts-node server.ts",
+    "dev": "next dev",
     "build": "next build",
-    "start": "NODE_ENV=production ts-node server.ts",
+    "start": "next start",
     "migrate": "ts-node src/database/migrate.ts || ts-node node_modules/knex/bin/cli.js migrate:latest --knexfile src/server/config/database.ts",
     "migrate:rollback": "ts-node src/database/migrate.rollback.ts || ts-node node_modules/knex/bin/cli.js migrate:rollback --knexfile src/server/config/database.ts",
     "seed": "ts-node src/database/seed.ts || ts-node node_modules/knex/bin/cli.js seed:run --knexfile src/server/config/database.ts",
